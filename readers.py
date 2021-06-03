@@ -131,9 +131,49 @@ def sort():
             wr.writerow(row)
 
 def advanced():
+    out = []
+    header = []
     with open("output/result.tsv", "r+", newline='') as file:
         reader = csv.reader(file, delimiter='\t')
-        
+        header.append(next(reader))
+        data_ds = []
+        data_ms =[]
+        to_pop = []
+        #out = []
+        for row in reader:
+            data_ds.append(row[:3])
+            data_ms.append(row[3:])
+        #print(data_ds, data_ms)
+        n = 1
+        for row in range(len(data_ds)):
+            current = data_ds.pop(0)
+            pos = n
+            if current in data_ds:
+                for j in data_ds:
+                    if j[0] != current[0]:
+                        break
+                    elif j == current and pos not in to_pop:
+                        lsum(data_ms[n-1], data_ms[pos])
+                        to_pop.append(pos)
+                    pos += 1
+            #print(row)
+            out.append(current + data_ms[row])
+            #print(out)
+            n += 1
+        to_del = list()
+        for i in to_pop:
+            to_del.append(out[i])
+        out = [ele for ele in out if ele not in to_del]
+    with open("output/advanced_result.tsv", "w", newline='') as output:
+        output_writer = csv.writer(output, delimiter='\t')
+        output_writer.writerow(header)
+        for row in out:
+            output_writer.writerow(row)
+
+
+def lsum(l1 : List, l2 : List):
+    for k in range(len(l1)):
+        l1[k] = int(l1[k]) + int(l2[k])
 
 
 def create_output(csv_d: Dict, json_d : Dict, xml_d : Dict):
@@ -157,6 +197,6 @@ def writer(any_dict : Dict, write_head : bool = False):
             tsv_writer.writerow(temp)
             temp.clear()
 
-
+advanced()
 #create_output(csv_dict, json_dict,xml_dict)
-sort()
+#sort()
